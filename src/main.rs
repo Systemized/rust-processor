@@ -1,67 +1,11 @@
-// // Vincent Nguyen
+// Vincent Nguyen
+
 use std::{io::{self, Write}, process::exit};
 
-// Max and Min range for 2^32 bits
-const MAX_INT32: i64 = (1 << 31) - 1;
-const MIN_INT32: i64 = -(1 << 31);
+mod processor;
 
-enum OutputFormat {
-    BIN,
-    DEC,
-    HEX,
-}
-struct Processor32 {
-    value: String,
-    overflow: u8,
-    saturated: u8,
-}
-
-impl Processor32 {
-    fn new(input: i64) -> Self {
-        let mut value = input;
-        let mut overflow = 0;
-        let mut saturated = 0;
-
-        if input > MAX_INT32 {
-            value = MAX_INT32;
-            overflow = 1;
-            saturated = 1;
-        } else if input < MIN_INT32 {
-            value = MIN_INT32;
-            overflow = 1;
-            saturated = 1;
-        }
-
-        // Convert to binary. Store/operate interally only on this 32bit.
-        let binary_value = format!("{:032b}", value as i32);
-
-        Processor32 {
-            value: binary_value,
-            overflow,
-            saturated,
-        }        
-    }
-
-    fn format(&self, user_format: OutputFormat) -> String {
-        match user_format {
-            OutputFormat::BIN => self.value.clone(),
-            OutputFormat::DEC => self.binary_to_decimal(),
-            OutputFormat::HEX => self.binary_to_hex(),
-        }
-    }
-
-    fn binary_to_decimal(&self) -> String {
-        let value = u32::from_str_radix(&self.value, 2).unwrap();
-        let value = value as i32;
-        value.to_string()
-    }
-
-    fn binary_to_hex(&self) -> String {
-        let value = u32::from_str_radix(&self.value, 2).unwrap();
-        format!("0x{:08X}", value)
-    }
-}
-
+use processor::Processor32;
+use crate::processor::OutputFormat;
 
 fn main() {
 
@@ -101,7 +45,7 @@ fn main() {
     };
 
     println!("\nValue Output: {}", format_result);
-    println!("Saturated:    ({}/1)", cpu.saturated);
-    println!("Overflow:     ({}/1)", cpu.overflow);
+    println!("Saturated:    ({}/1)", cpu.overflow());
+    println!("Overflow:     ({}/1)", cpu.saturated());
 
 }
