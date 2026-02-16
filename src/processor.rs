@@ -23,6 +23,7 @@ impl Processor32 {
         let mut overflow = 0;
         let mut saturated = 0;
 
+        // Clamps values to max and min if overflows. also raises flags.
         if value > MAX_INT32 {
             value = MAX_INT32;
             overflow = 1;
@@ -66,5 +67,83 @@ impl Processor32 {
 
     pub fn saturated(&self) -> u8 {
         self.saturated
+    }
+}
+
+
+
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn test_positive_number() {
+        let test_cpu = Processor32::new(123);
+        assert_eq!(test_cpu.format(OutputFormat::BIN), "00000000000000000000000001111011");
+        assert_eq!(test_cpu.format(OutputFormat::DEC), "123");
+        assert_eq!(test_cpu.format(OutputFormat::HEX), "0x0000007B");
+        assert_eq!(test_cpu.overflow(), 0);
+        assert_eq!(test_cpu.saturated(), 0);
+    }
+
+    #[test]
+    fn test_zero_value() {
+        let test_cpu = Processor32::new(0);
+        assert_eq!(test_cpu.format(OutputFormat::BIN), "00000000000000000000000000000000");
+        assert_eq!(test_cpu.format(OutputFormat::DEC), "0");
+        assert_eq!(test_cpu.format(OutputFormat::HEX), "0x00000000");
+        assert_eq!(test_cpu.overflow(), 0);
+        assert_eq!(test_cpu.saturated(), 0);
+    }
+
+    #[test]
+    fn test_negative_number() {
+        let test_cpu = Processor32::new(-123);
+        assert_eq!(test_cpu.format(OutputFormat::BIN), "11111111111111111111111110000101");
+        assert_eq!(test_cpu.format(OutputFormat::DEC), "-123");
+        assert_eq!(test_cpu.format(OutputFormat::HEX), "0xFFFFFF85");
+        assert_eq!(test_cpu.overflow(), 0);
+        assert_eq!(test_cpu.saturated(), 0);
+    }
+
+    #[test]
+    fn test_max_boundary_value() {
+        let test_cpu = Processor32::new(MAX_INT32);
+        assert_eq!(test_cpu.format(OutputFormat::BIN), "01111111111111111111111111111111");
+        assert_eq!(test_cpu.format(OutputFormat::DEC), "2147483647");
+        assert_eq!(test_cpu.format(OutputFormat::HEX), "0x7FFFFFFF");
+        assert_eq!(test_cpu.overflow(), 0);
+        assert_eq!(test_cpu.saturated(), 0);
+    }
+
+    #[test]
+    fn test_min_boundary_value() {
+        let test_cpu = Processor32::new(MIN_INT32);
+        assert_eq!(test_cpu.format(OutputFormat::BIN), "10000000000000000000000000000000");
+        assert_eq!(test_cpu.format(OutputFormat::DEC), "-2147483648");
+        assert_eq!(test_cpu.format(OutputFormat::HEX), "0x80000000");
+        assert_eq!(test_cpu.overflow(), 0);
+        assert_eq!(test_cpu.saturated(), 0);
+    }
+
+    #[test]
+    fn test_max_overflow() {
+        let test_cpu = Processor32::new(MAX_INT32 + 1);
+        assert_eq!(test_cpu.format(OutputFormat::BIN), "01111111111111111111111111111111");
+        assert_eq!(test_cpu.format(OutputFormat::DEC), "2147483647");
+        assert_eq!(test_cpu.format(OutputFormat::HEX), "0x7FFFFFFF");
+        assert_eq!(test_cpu.overflow(), 1);
+        assert_eq!(test_cpu.saturated(), 1);
+    }
+
+    #[test]
+    fn test_min_overflow() {
+        let test_cpu = Processor32::new(MIN_INT32 - 1);
+        assert_eq!(test_cpu.format(OutputFormat::BIN), "10000000000000000000000000000000");
+        assert_eq!(test_cpu.format(OutputFormat::DEC), "-2147483648");
+        assert_eq!(test_cpu.format(OutputFormat::HEX), "0x80000000");
+        assert_eq!(test_cpu.overflow(), 1);
+        assert_eq!(test_cpu.saturated(), 1);
     }
 }
