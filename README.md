@@ -2,11 +2,25 @@
 
 A project to simulate a processor, built in Rust, for Computer Architecture course
 
-#### Prerequisite
-- [Rust](https://rust-lang.org/tools/install/)
+## Prerequisite
+> Install [Rust](https://rust-lang.org/tools/install/)
 
-# Getting Started
-- To run file
+- For Unix/Linix, rust can be install using curl
+```sh
+curl --proto '=https' --tlsv1.2 -sSf https://sh.rustup.rs | sh
+```
+- Restart shell
+```sh
+. "$HOME/.cargo/env" 
+```
+
+## Getting Started
+- Clone and cd into repo
+```sh
+git clone https://github.com/Systemized/rust-processor.git && cd rust-processor
+```
+
+- To run program
 ```sh
 cargo run
 ```
