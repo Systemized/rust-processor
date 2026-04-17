@@ -5,10 +5,11 @@ use std::{io::{self}, process::exit};
 mod processor;
 mod kmap;
 mod memory;
+mod singlecycle;
 fn main() {
 
     let mut user_input = String::new();
-    println!("Select a number to run:\n  [0] Processor\n  [1] K-Map\n  [2] Memory");
+    println!("Select a number to run:\n  [0] Processor\n  [1] K-Map\n  [2] Memory\n  [3] Single-Cycle");
 
     io::stdin()
         .read_line(&mut user_input)
@@ -26,6 +27,7 @@ fn main() {
         0 => processor::run(),
         1 => kmap::run(),
         2 => memory::run(),
+        3 => singlecycle::run(),
         _ => {
             println!("Error. Choose from options.");
             exit(1);
